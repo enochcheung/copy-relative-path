@@ -2,7 +2,7 @@
     "name": "copy-relative-path",
     "displayName": "Copy Relative Path of Active File",
     "description": "Copy relative path of active file, complementing the built-in workbench.action.files.copyPathOfActiveFile",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "publisher": "enochc",
     "engines": {
         "vscode": "^1.5.0"
@@ -15,10 +15,12 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
-            "command": "extension.copyRelativePathOfActiveFile",
-            "title": "Copy Relative Path of Active File"
-        }]
+        "commands": [
+            {
+                "command": "extension.copyRelativePathOfActiveFile",
+                "title": "Copy Relative Path of Active File"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
