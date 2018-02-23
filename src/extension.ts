@@ -15,13 +15,15 @@ export function activate(context: vscode.ExtensionContext) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
+
+    const prefix = vscode.workspace.getConfiguration('relativePath').get('prefix');
     let disposable = vscode.commands.registerCommand('extension.copyRelativePathOfActiveFile', () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor) {
             const workspace = vscode.workspace;
             // Copy relative path if a folder is opened, copy the full path otherwise.
             const path = workspace.rootPath ? workspace.asRelativePath(activeEditor.document.uri) : activeEditor.document.fileName;
-            copy(path);
+            copy(`${prefix ? prefix + ' ' : ''}${path}`);
         } else {
             vscode.window.showInformationMessage("Open a file first to copy its path");
         }

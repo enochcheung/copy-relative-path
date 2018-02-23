@@ -8,3 +8,10 @@ Add something like this to your `keybindings.json`
 ```
 {"key": "cmd+shift+c", "command": "extension.copyRelativePathOfActiveFile"}
 ```
+
+Add an optional prefix to your project workspace settings `./.vscode/settings.json`
+```
+{
+    "relativePath.prefix": "npm run mocha --"
+}
+```
