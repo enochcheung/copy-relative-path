@@ -20,7 +20,14 @@
                 "command": "extension.copyRelativePathOfActiveFile",
                 "title": "Copy Relative Path of Active File"
             }
-        ]
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "extension.copyRelativePathOfActiveFile"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
