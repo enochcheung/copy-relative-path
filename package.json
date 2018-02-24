@@ -15,6 +15,25 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Copy Relative Path of Active File configuration",
+      "properties": {
+        "relativePath.mult-root": {
+          "type": "boolean",
+          "default": false,
+          "description": "Support for mutli-root workspaces. Shifts the path in by 1"
+        },
+        "relativePath.prefix": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Adds a prefix to your relative path"
+        }
+      }
+    },
     "commands": [
       {
         "command": "extension.copyRelativePathOfActiveFile",
