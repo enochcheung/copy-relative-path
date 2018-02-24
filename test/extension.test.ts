@@ -1,22 +1,54 @@
-//
-// Note: This example test is leveraging the Mocha test framework.
-// Please refer to their documentation on https://mochajs.org/ for help.
-//
 
-// The module 'assert' provides assertion methods from node
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
-import * as myExtension from '../src/extension';
+import * as sinon from 'sinon';
+import * as copyPaste from 'copy-paste';
+import { copyRelativePathOfActiveFile } from '../src/extension';
 
-// Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+describe('copy-relative-path', () => {
+    let sandbox: sinon.SinonSandbox;
+    let copyStub: sinon.SinonStub;
 
-    // Defines a Mocha unit test
-    test("Something 1", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
+    const createGetPrefixStub = (prefix = undefined) => sandbox.stub(vscode.workspace, 'getConfiguration').returns({
+        get: sandbox.stub().withArgs('prefix').returns(prefix)
     });
-});
+    const createRootPathStub = (rootPath) => sandbox.stub(vscode.workspace, 'rootPath').get(() => rootPath);
+    const createActiveEditorStub = () => sandbox.stub(vscode.window, 'activeTextEditor').get(() => ({ document: { fileName: 'some/other/path' } }));
+    beforeEach(() => {
+        sandbox = sinon.sandbox.create();
+        copyStub = sandbox.stub(copyPaste, 'copy');
+    });
+    afterEach(() => sandbox.restore());
+
+    it('shows an information message if there is no active editor', () => {
+        sandbox.stub(vscode.window, 'activeTextEditor').get(() => undefined);
+        const showInformationStub: sinon.SinonStub = sandbox.stub(vscode.window, 'showInformationMessage');
+        copyRelativePathOfActiveFile();
+        assert.equal(showInformationStub.firstCall.args[0], 'Open a file first to copy its path');
+    });
+
+    it('uses activeEditor.document.fileName if no workspace.rootpath', () => {
+        createActiveEditorStub();
+        createRootPathStub(undefined);
+        copyRelativePathOfActiveFile();
+        assert.equal(copyStub.firstCall.args[0], 'some/other/path');
+    });
+
+    it('uses workspace.asRelativePath if workspace.rootpath is present', () => {
+        createActiveEditorStub();
+        createRootPathStub('/some/even/longer/path/' + 'some/path');
+        sandbox.stub(vscode.workspace, 'asRelativePath').returns('some/path');
+        copyRelativePathOfActiveFile();
+        assert.equal(copyStub.firstCall.args[0], 'some/path');
+    });
+
+    it('appends a prefix if the prefix is set', () => {
+        createActiveEditorStub();
+        createRootPathStub('/some/even/longer/path/' + 'some/path');
+        createGetPrefixStub('im a prefix');
+        sandbox.stub(vscode.workspace, 'asRelativePath').returns('some/path');
+        copyRelativePathOfActiveFile();
+        assert.equal(copyStub.firstCall.args[0], 'im a prefix some/path');
+    });
+
+})
