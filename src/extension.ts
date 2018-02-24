@@ -1,22 +1,26 @@
-'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { copy } from 'copy-paste';
 
-export const copyRelativePathOfActiveFile = () => {
-    const { activeTextEditor } = vscode.window;
-    if (activeTextEditor) {
-        const { workspace } = vscode;
-        const prefix = workspace.getConfiguration('relativePath').get('prefix');
-        // Copy relative path if a folder is opened, copy the full path otherwise.
-        const path = workspace.rootPath
-            ? workspace.asRelativePath(activeTextEditor.document.uri)
-            : activeTextEditor.document.fileName;
+export const shiftPath = (path: string) => path.split('/').slice(1).join('/');
 
-        copy(`${prefix ? prefix + ' ' : ''}${path}`);
+export const copyRelativePathOfActiveFile = () => {
+    const { activeTextEditor, showInformationMessage } = vscode.window;
+    if (activeTextEditor) {
+        const { workspace: { getConfiguration, rootPath, asRelativePath }, window: { activeTextEditor } } = vscode;
+
+        const config = getConfiguration('relativePath');
+
+        // Copy relative path if a folder is opened, copy the full path otherwise.
+        const path = rootPath ? asRelativePath(activeTextEditor.document.uri) : activeTextEditor.document.fileName;
+
+        const isMultiRoot = config.get('multi-root');
+        const prefix = config.get('prefix') ? `${config.get('prefix')} ` : '';
+
+        copy(`${prefix}${isMultiRoot ? shiftPath(path) : path}`);
     } else {
-        vscode.window.showInformationMessage("Open a file first to copy its path");
+        showInformationMessage("Open a file first to copy its path");
     }
 }
 

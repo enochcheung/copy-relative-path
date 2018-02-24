@@ -15,3 +15,10 @@ Add an optional prefix to your project workspace settings `./.vscode/settings.js
     "relativePath.prefix": "npm run mocha --"
 }
 ```
+
+Support for multiroot workspaces by adding multi-root to your workspace settings
+```
+{
+    "relativePath.multi-root": true
+}
+```
